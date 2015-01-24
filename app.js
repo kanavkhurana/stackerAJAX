@@ -6,6 +6,13 @@ $(document).ready( function() {
 		var tags = $(this).find("input[name='tags']").val();
 		getUnanswered(tags);
 	});
+	$('.inspiration-getter').submit( function(event){
+		// zero out results if previous search has run
+		$('.results').html('');
+		// get the value of the tags the user submitted
+		var tags = $(this).find("input[name='answerers']").val();
+		getTop30Answerers(tags);
+	});
 });
 
 // this function takes the question object returned by StackOverflow 
@@ -41,6 +48,33 @@ var showQuestion = function(question) {
 	return result;
 };
 
+// this function takes the user object returned by StackOverflow 
+// and creates new result to be appended to DOM
+var showAnswerer = function(user) {
+	
+	// clone our result template code
+	var result = $('.templates .topanswerers').clone();
+	
+	// Set the user properties in result
+	var questionElem = result.find('.display-name a');
+	questionElem.attr('href', user.user.link);
+	questionElem.text(user.user.display_name);
+
+	// set the date asked property in result
+	var score = result.find('.score');
+	//var date = new Date(1000*question.creation_date);
+	score.text(user.score);
+
+	// set the #views for question property in result
+	var reputation = result.find('.reputation');
+	reputation.text(user.user.reputation);
+
+	// set some properties related to asker
+	var profileImage = result.find('.image img');
+	profileImage.attr('src',user.user.profile_image);
+
+	return result;
+};
 
 // this function takes the results object from StackOverflow
 // and creates info about search results to be appended to DOM
@@ -53,7 +87,9 @@ var showSearchResults = function(query, resultNum) {
 var showError = function(error){
 	var errorElem = $('.templates .error').clone();
 	var errorText = '<p>' + error + '</p>';
-	errorElem.append(errorText);
+	//CORRECTION? ErrorElem being printed twice
+	//errorElem.append(errorText);
+	return errorElem;
 };
 
 // takes a string of semi-colon separated tags to be searched
@@ -80,6 +116,38 @@ var getUnanswered = function(tags) {
 		$.each(result.items, function(i, item) {
 			var question = showQuestion(item);
 			$('.results').append(question);
+		});
+	})
+	.fail(function(jqXHR, error, errorThrown){
+		var errorElem = showError(error);
+		$('.search-results').append(errorElem);
+	});
+};
+
+// takes a string of semi-colon separated tags to be searched
+// for on StackOverflow
+var getTop30Answerers = function(tags) {
+	
+	// the parameters we need to pass in our request to StackOverflow's API
+	var request = {//tagged: tags,
+								site: 'stackoverflow'};
+								//order: 'desc',
+								//sort: 'creation'};
+	
+	var result = $.ajax({
+		url: "http://api.stackexchange.com/2.2/tags/"+tags+"/top-answerers/month",
+		data: request,
+		dataType: "jsonp",
+		type: "GET",
+		})
+	.done(function(result){
+		var searchResults = showSearchResults(tags, result.items.length);
+
+		$('.search-results').html(searchResults);
+
+		$.each(result.items, function(i, item) {
+			var user = showAnswerer(item);
+			$('.results').append(user);
 		});
 	})
 	.fail(function(jqXHR, error, errorThrown){

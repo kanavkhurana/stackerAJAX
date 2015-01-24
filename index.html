@@ -22,6 +22,7 @@
 			<h3>Get Unanswered Questions</h3>
 			<p>Find unanswered questions by tag. For multiple tags, use a semi-colon to separate.</p>
 			<form class="unanswered-getter" onsubmit="return false;">
+				<!--autofocus set so that cursor is here once the page loads-->
 				<input type="text" placeholder='e.g., "HTML" or "HTML;CSS"' name="tags" size="30" autofocus required>
 				<input type="submit" value="Submit">
 			</form>
@@ -33,9 +34,10 @@
 		</div>
 		<div class="results-container">
 			<div class="search-results"></div>
-			<div class="results">
+			<div class="results"></div>
 		</div>
 	</div>
+	<!--Very interesting - created templates and hid them -->
 	<div class="templates hidden">
 		<dl class="result question">
 			<dt>Question</dt>
@@ -46,6 +48,16 @@
 				<dd class="viewed"></dd>
 			<dt>Asker</dt>
 				<dd class="asker"></dd>
+		</dl>
+		<dl class="result topanswerers">
+			<dt>User Display Name</dt>
+				<dd class="display-name"><a href="" target="_blank"></a></dd>
+			<dt>Score</dt>
+				<dd class="score"></dd>
+			<dt>Reputation</dt>
+				<dd class="reputation"></dd>
+			<dt>Profile Image</dt>
+				<dd class="image"><img src=""></dd>
 		</dl>
 		<div class="error">
 			<p>Uh-oh! Something went wrong with your request. Here's what we know:</p>
